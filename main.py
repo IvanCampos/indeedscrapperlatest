@@ -5,15 +5,16 @@ import time
 from functions import *
 
 
-# limit per sity
-max_results_per_city = 100
+# limit per city
+max_results_per_city = 1000
 
 # db of city 
-city_set = ['New+York','Toronto','Las+Vegas']
+city_set = ['Boston']
 
 # job roles
-job_set = ['business+analyst','data+scientist']
+job_set = ['data+scientist']
 
+company_set = ['Slalom Consulting']
 
 # file num
 file = 1
@@ -35,13 +36,13 @@ for city in city_set:
         if(file > SKIPPER):
         
             # dataframe
-            df = pd.DataFrame(columns = ['unique_id', 'city', 'job_qry','job_title', 'company_name', 'location', 'summary', 'salary', 'link', 'date', 'full_text'])
+            df = pd.DataFrame(columns = ['unique_id', 'job_title', 'company_name', 'location', 'summary', 'salary', 'link', 'date', 'full_text'])
         
             # for results
             for start in range(0, max_results_per_city, 10):
 
                 # get dom 
-                page = requests.get('http://www.indeed.com/jobs?q=' + job_qry +'&l=' + str(city) + '&start=' + str(start))
+                page = requests.get('http://www.indeed.com/jobs?q=slalom+consulting&start=' + str(start))
 
                 #ensuring at least 1 second between page grabs                    
                 time.sleep(1)  
@@ -68,10 +69,10 @@ for city in city_set:
                     job_post.append(div['id'])
 
                     #append city name
-                    job_post.append(city)
+                    # job_post.append(city)
 
                     #append job qry
-                    job_post.append(job_qry)
+                    # job_post.append(job_qry)
 
                     #grabbing job title
                     job_post.append(extract_job_title(div))
@@ -102,7 +103,7 @@ for city in city_set:
                     df.loc[num] = job_post
                     
                 #debug add
-                write_logs(('Completed =>') + '\t' + city  + '\t' + job_qry + '\t' + str(cnt) + '\t' + str(start) + '\t' + str(time.time() - startTime) + '\t' + ('file_' + str(file)))
+                write_logs(('Completed =>') + '\t' + job_qry + '\t' + str(cnt) + '\t' + str(start) + '\t' + str(time.time() - startTime) + '\t' + ('file_' + str(file)))
 
             #saving df as a local csv file 
             df.to_csv('jobs_' + str(file) + '.csv', encoding='utf-8')
@@ -110,7 +111,7 @@ for city in city_set:
         else:
 
             #debug add
-            write_logs(('Skipped =>') + '\t' + city  + '\t' + job_qry + '\t' + str(-1) + '\t' + str(-1) + '\t' + str(time.time() - startTime) + '\t' + ('file_' + str(file)))
+            write_logs(('Skipped =>') + '\t' + job_qry + '\t' + str(-1) + '\t' + str(-1) + '\t' + str(time.time() - startTime) + '\t' + ('file_' + str(file)))
         
         # increment file
         file = file + 1
